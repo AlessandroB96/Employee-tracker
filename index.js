@@ -196,6 +196,7 @@ let addRole = () => {
             console.log('\n');
             console.log('Added new role');
         });
+        return furtherInput();
     })
 }
 
@@ -248,6 +249,7 @@ let addEmployee = () => {
             console.log('\n');
             console.log(`${answers.firstName} ${answers.lastName} is added as a new employee`);
         })
+        return furtherInput();
     });
 }
 

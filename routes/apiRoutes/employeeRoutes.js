@@ -23,7 +23,7 @@ router.post('/employees', ({body}, res) => {
                     VALUES (?,?,?)`
     const params = [body.first_name, body.last_name, body.role_id];
 
-    db.query(sql, params, (err, result) => {
+    db.query(sql, params, (err) => {
         if (err) {
             res.status(400).json({ error: err.message });
             return;
@@ -57,6 +57,30 @@ router.put('/employees/:id', (req, res) => {
                 changes: result.affectedRows
             });
         }
+    });
+})
+
+//delete an employee
+router.delete('/employees/:id', (req, res) => {
+ 
+    const sql = `DELETE FROM employee WHERE id = ?`;
+    const params = [req.params.id];
+
+    db.query(sql, params, (err, result) => {
+        if (err) {
+            res.status(400).json({ error: err.message });
+            return;
+        } else if (!result.affectedRows) {
+            res.json({
+                message: 'employee not found'
+            });
+        } else {
+            res.json({
+                message: 'deleted',
+                changes: result.affectedRows,
+                id: req.params.id 
+            });
+        }    
     });
 })
 

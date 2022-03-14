@@ -2,7 +2,11 @@ const inquirer = require('inquirer');
 const cTable = require('console.table');
 const db = require('./db/connection');
 const express = require('express');
+const { all } = require('./routes/apiRoutes');
 const router = express.Router();
+
+let allEmployees = [];
+
 
 const promptUser = () => {
 
@@ -187,7 +191,7 @@ let addRole = () => {
         }
     ])
     .then(answers => {
-        const sql = `INSERT INTO role (title, salary, department_id)
+        const sql = `INSERT INTO roles (title, salary, department_id)
         VALUES ('${answers.roleName}','${answers.salary}','${answers.department}')`;
         db.query(sql, (err) => {
             if (err) {
@@ -253,6 +257,47 @@ let addEmployee = () => {
     });
 }
 
+let updateEmployeeRole = () => {
+    
+    let sql = `SELECT concat(employee.first_name, ' ' , employee.last_name) AS name FROM employee`;
+    
+    db.query(sql, (err, rows1) => {
+        if (err) {
+            console.log(err)
+        }
+     inquirer.prompt([
+            {
+                type: 'list',
+                name: 'name',
+                message: "Which employee would you like to edit? ",
+                choices: rows1.map(results => results.name)
+            },
+            {
+                type: 'list',
+                name: 'role',
+                message: "What is the employee's new role? ",
+                choices: ['Sales Representative','Marketing Associate','UI Engineer','HR Associate','Dev Ops Engineer','Back-End Engineer']
+            }
+        ])
+        .then(answers => {
+            const sql = `SELECT roles.id FROM roles WHERE roles.title = ('${answers.role})'
+                         WHERE name = ('${answers.name}')
+                         UPDATE employee SET role_id = (${answers.role})
+                         WHERE id = (${answers.name})`;
+            db.query(sql, (err) => {
+                if (err) {
+                    console.log(err)
+                }
+                console.log('\n');
+                console.log(`${answers.name} is now a ${answers.role}`);
+            })
+            return furtherInput()
+        });
+    })
+};
+
 startPrompt();
 
 module.exports = { promptUser , startPrompt };
+
+
